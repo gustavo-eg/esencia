@@ -15,16 +15,16 @@ class CreateInscripcionsTable extends Migration
     {
         Schema::create('inscripcions', function (Blueprint $table) {
             $table->id();
-            $table->integer('nro_entrada')->nullable();
+            $table->integer('nro_entrada')->nullable(); //quizá no se use, pero se lo deja.
             $table->date('fecha');
             $table->string('n_apellido');
             $table->bigInteger('celular')->nullable();
-            $table->string('membresia');
-            $table->string('valorTotal');
-            $table->string('inscribio');
-            $table->string('promo');
-            //$table->boolean('completado')->nullable()->change(); //para tomar los cambios
-            $table->boolean('completado')->nullable();
+            $table->string('membresia'); // (local, interior, otra_iglesia)
+            $table->string('valorTotal'); // valor que deberá pagar en total
+            $table->string('inscribio'); // id de la persona que inscribe ('nn': no se sabe)
+            $table->string('tipo'); // (general, adolescente, pastora, especial)
+            $table->string('financiacion'); // (completo; cuotas)
+            $table->boolean('completado')->nullable(); //cuando se completa el pago
             $table->timestamps();
         });
     }
