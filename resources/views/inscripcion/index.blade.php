@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Esencia 2024')
+@section('title', 'Esencia' . env('APP_ANIO', '2026'))
 
 @section('content_header')
     <h1>Inscriptas Esencia 2026</h1>
@@ -12,25 +12,21 @@
     <table id="inscripciones" class="table  table-hover table-bordered border-danger table-striped mt-4" style="width:100%">
         <thead class="bg-danger">
             <tr>
-                <th scope="col">Nro Entrada</th>
                 <th scope="col">Fecha</th>
                 <th scope="col">Nombre y Apellido</th>
-                <th scope="col">Celular</th>
-                <th scope="col">Membresía</th>
-                <th scope="col">Talle</th>
+                <th scope="col">Tipo</th>
                 <th scope="col">Estado</th>
+                <th scope="col">Observaciones</th>
+                <th scope="col">Celular</th>
                 <th scope="col">Acciones</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($inscripciones as $inscripcion)
                 <tr>
-                    <td>{{ $inscripcion->nro_entrada }}</td>
                     <td>{{ date('d/m/Y', strtotime($inscripcion->fecha)) }}</td>
                     <td>{{ $inscripcion->n_apellido }}</td>
-                    <td>{{ $inscripcion->celular }}</td>
-                    <td>{{ $inscripcion->membresia }}</td>
-                    <td>{{ $inscripcion->lider}}</td>
+                    <td>{{ ucwords(mb_strtolower($inscripcion->tipo))}}</td>
                     <td>
                         @if ($inscripcion->completado == 1)
                             <span class="text-success">Pagado <i class="fas fa-check-circle fa-lg"></i></span>
@@ -38,6 +34,8 @@
                             Pendiente
                         @endif
                     </td>
+                    <td>{{ $inscripcion->observacion }}</td>
+                    <td>{{ $inscripcion->celular }}</td>
                     <td>
                         <form action="{{ route('inscripcion.destroy', $inscripcion->id) }}" method="POST">
                             @csrf

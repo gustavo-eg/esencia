@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Recepcionista;
 use Illuminate\Http\Request;
 use App\Models\Inscripcion;
 use App\Models\Pago;
@@ -100,8 +101,9 @@ class PagoController extends Controller
                 ->get();  //se puede filtrar
         $total = Pago::where('inscripcion_id',$id)->sum('importe');
         $inscripcion = Inscripcion::find($id);  //se puede filtrar
+        $recepcionista = Recepcionista::find($inscripcion->inscribio);
 
-        return view('pago.index', ['inscripcion' => $inscripcion,'pagos' => $pagos,'total' => $total]);
+        return view('pago.index', ['inscripcion' => $inscripcion,'pagos' => $pagos,'total' => $total, 'recepcionista' => $recepcionista]);
     }
 
     /**

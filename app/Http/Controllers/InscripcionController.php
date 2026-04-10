@@ -54,23 +54,27 @@ class InscripcionController extends Controller
             'celular' => 'nullable | numeric | gt:0',
             'fecha' => 'required | date',
             'inscribio' => 'required',
-            'importe' => 'required | numeric | digits_between:1,6',
+            'financiacion' => 'required',
             'valorTotal' => 'required | numeric | digits_between:1,6'
         ]);
         //guardado de los datos del formulario de alta
         $inscripcion = new Inscripcion();
-        $inscripcion->nro_entrada = $request->get('nro_entrada');
+        //$inscripcion->nro_entrada = $request->get('nro_entrada');
         $inscripcion->fecha = $request->get('fecha');
         $inscripcion->n_apellido = ucwords(mb_strtolower($request->get('n_apellido')));
         $inscripcion->celular = $request->get('celular');
         $inscripcion->membresia = $request->get('membresia');
-        $inscripcion->valorTotal = $request->get('valorTotal'); // se usa para saber el importe total que tiene que pagar
         $inscripcion->inscribio = ucwords(mb_strtolower($request->get('inscribio')));
-        $inscripcion->promo = $request->get('promo');
-        if($request->get('promo') != "cuotas"){
-            $inscripcion->completado = 1;
+        $inscripcion->tipo = $request->get('tipo');
+        $inscripcion->observacion = $request->get('observacion');
+
+        $inscripcion->valorTotal = $request->get('valorTotal'); // se usa para saber el importe total que tiene que pagar
+        if($request->get('financiacion') == "cuotas"){
+            $inscripcion->financiacion = 1; //true
+            $inscripcion->completado = 0; //no está completado cuando inicia con cuotas
         }else{
-            $inscripcion->completado = 0;
+            $inscripcion->completado = 1; //paga inicial completo
+            $inscripcion->financiacion = 0; //no hay financiacion
         }
 
         $inscripcion->save();

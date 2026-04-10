@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Esencia 2024')
+@section('title', 'Esencia' . env('APP_ANIO', '2026'))
 
 @section('content_header')
     <h1>Pagos</h1>
@@ -10,43 +10,30 @@
     <div class="col-12 row">
         <div class="col-md-2">
             <label for="fecha" class="form-label">Fecha Inscripción</label>
-            <input type="date" readonly class="form-control-plaintext" id="fecha" name="fecha"
-                value="{{ $inscripcion->fecha }}">
+            <span>{{ $inscripcion->fecha }}</span>
+            {{-- Dar formato a la fecha para mostrar --}}
         </div>
         <div class="col-md-3">
             <label for="n_apellido" class="form-label">Nombre y Apellido</label>
-            <input type="text" readonly class="form-control-plaintext" id="n_apellido" name="n_apellido"
-                value="{{ $inscripcion->n_apellido }}">
+            <span>{{ $inscripcion->n_apellido }}</span>
         </div>
         <div class="col-md-2">
             <label for="celular" class="form-label">Contacto</label>
-            <input type="number" readonly class="form-control-plaintext" id="celular" name="celular"
-                value="{{ $inscripcion->celular }}">
+            <span>{{ $inscripcion->celular }}</span>
         </div>
         <div class="col-md-2">
             <label for="membresia" class="form-label">Membresía</label>
-            <input type="text" readonly class="form-control-plaintext" id="membresia" name="membresia"
-                value="{{ $inscripcion->membresia }}">
+            <span>{{ $inscripcion->membresia }}</span>
         </div>
         <div class="col-md-2">
             <label for="valorTotal" class="form-label">Valor Total</label>
-            <input type="text" readonly class="form-control-plaintext" id="valorTotal" name="valorTotal"
-                value="{{ $inscripcion->valorTotal }}">
+            <span>{{ $inscripcion->valorTotal }}</span>
         </div>
         <div class="col-md-3 mb-3">
             <label for="inscribio" class="form-label">Incribió</label>
-            <input type="text" readonly class="form-control-plaintext" id="inscribio" name="inscribio"
-                value="{{ $inscripcion->inscribio }}">
+            <span>{{ $recepcionista->nombre }} {{ $recepcionista->apellido }}</span>
         </div>
     </div>
-
-    {{-- <div class="col-12 row">
-    <span>Resumen de pagos</span>
-    <label for="" class="">Total: {{$total}}</label>
-    <label for="" class="">Falta: {{(80000 - $total)}}</label>
-    <label for="" class="">Estado: </label>
-
-</div> --}}
 
     <div class="alert @if ($inscripcion->completado == 1) alert-success @else alert-danger @endif" role="alert">
         <div class="row">

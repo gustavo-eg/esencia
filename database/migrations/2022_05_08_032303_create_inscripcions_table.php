@@ -25,6 +25,7 @@ class CreateInscripcionsTable extends Migration
             $table->string('tipo'); // (general, adolescente, pastora, especial)
             $table->string('financiacion'); // (completo; cuotas)
             $table->boolean('completado')->nullable(); //cuando se completa el pago
+            $table->string('observacion')->nullable();
             $table->timestamps();
         });
     }

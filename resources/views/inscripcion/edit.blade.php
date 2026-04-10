@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Esencia 2023')
+@section('title', 'Esencia' . env('APP_ANIO', '2026'))
 
 @section('content_header')
     <h1>Editar Inscripción</h1>

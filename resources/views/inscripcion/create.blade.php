@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Esencia 2023')
+@section('title', 'Esencia' . env('APP_ANIO', '2026'))
 
 @section('content_header')
     <h1>Nueva Inscripción</h1>
@@ -20,10 +20,10 @@
                 </span>
             @enderror
         </div>
-        <div class="col-md-2">
+        {{-- <div class="col-md-2">
             <label for="nro_entrada" class="form-label">Nro Entrada</label>
             <input type="number" class="form-control" id="nro_entrada" name="nro_entrada">
-        </div>
+        </div> --}}
         <div class="col-md-3">
             <label for="n_apellido" class="form-label">Nombre y Apellido</label>
             <input type="text" class="form-control @error('n_apellido') is-invalid @enderror" id="n_apellido"
@@ -65,7 +65,7 @@
             <label for="inscribio" class="form-label">Incribió</label>
             <select id="inscribio" name="inscribio" class="form-control">
                @foreach ($recepcionistas as $recepcionista)
-                <option value="´{{$recepcionista->id}}">{{$recepcionista->nombre}} {{$recepcionista->apellido}}</option>
+                <option value="{{$recepcionista->id}}">{{$recepcionista->nombre}} {{$recepcionista->apellido}}</option>
                @endforeach
                <option value="nn">No se sabe</option>
             </select>
@@ -97,6 +97,7 @@
                         <div class="col-md-2">
                             <label for="valorTotal" class="form-label">Valor Total</label>
                             <select id="valorTotal" name="valorTotal" class="form-control">
+                                <option value="0" {{ old('valorTotal') === '0' ? 'selected' : '' }}>No paga</option>
                                 <option value="40000" {{ old('valorTotal') === '40000' ? 'selected' : '' }}>40000</option>
                                 <option value="50000" {{ old('valorTotal') === '50000' ? 'selected' : '' }}>50000</option>
                                 <option value="80000" {{ old('valorTotal') === '80000' ? 'selected' : '' }}>80000</option>
@@ -117,8 +118,9 @@
                         <div class="col-5">
                             <label for="formapago" class="form-label">Forma de Pago</label>
                             <select id="formapago" name="formapago" class="form-control">
+                                <option value="transferencia">Transferencia</option>
                                 <option value="efectivo">Efectivo</option>
-                                <option value="transf">Transf.</option>
+                                <option value="tarjeta">Tarjeta</option>
                             </select>
                         </div>
                         <div class="col-5">

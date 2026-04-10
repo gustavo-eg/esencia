@@ -20,7 +20,7 @@
 
 <body>
     <div >
-        <h5 class=" font-weight-bold">Reporte Inscriptas Esencia 2024</h5>
+        <h5 class=" font-weight-bold">Reporte Inscriptas Esencia 2026</h5>
         <p class="text"><b>Filtros Aplicados:</b> Membresía: {{$membresia}}, Promo: {{$promo}}, Pagados: {{$completado}}, 
             Cantidad total en reporte: {{count($inscripciones)}}
         </p>
