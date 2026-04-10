@@ -15,7 +15,15 @@ class RecepcionistaSeeder extends Seeder
     public function run()
     {
         //llenado inicial de las recepionistas que inscriben
-          Recepcionista::create([
+        Recepcionista::create([
+            'nombre' => 'Claudia',
+            'apellido' => 'Campopya'
+        ]);
+        Recepcionista::create([
+            'nombre' => 'Leila',
+            'apellido' => 'Farfán'
+        ]);
+        Recepcionista::create([
             'nombre' => 'Natalia',
             'apellido' => 'Barrionuevo'
         ]);
