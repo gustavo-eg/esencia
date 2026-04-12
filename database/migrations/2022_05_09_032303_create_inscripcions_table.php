@@ -21,11 +21,16 @@ class CreateInscripcionsTable extends Migration
             $table->bigInteger('celular')->nullable();
             $table->string('membresia'); // (local, interior, otra_iglesia)
             $table->string('valorTotal'); // valor que deberá pagar en total
-            $table->string('inscribio'); // id de la persona que inscribe ('nn': no se sabe)
+            //$table->string('inscribio'); // id de la persona que inscribe ('nn': no se sabe)
             $table->string('tipo'); // (general, adolescente, pastora, especial)
             $table->string('financiacion'); // (completo; cuotas)
             $table->boolean('completado')->nullable(); //cuando se completa el pago
             $table->string('observacion')->nullable();
+            $table->foreignId('id_recepcionista')
+                ->nullable()
+                ->constrained('recepcionistas','id')
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
             $table->timestamps();
         });
     }

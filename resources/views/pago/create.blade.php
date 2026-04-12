@@ -3,51 +3,49 @@
 @section('title', 'Esencia' . env('APP_ANIO', '2026'))
 
 @section('content_header')
-    <h1>Nueva Cuota</h1>
+    <h1>Nueva Cuota - {{ $inscripcion->n_apellido}}</h1>
 @stop
 
 @section('content')
-    <form class="row g-3 needs-validation" novalidate action="/pago" method="post">
-        @csrf
+    
+        <div class="col-12 row">
         <div class="col-md-2">
-            <label for="fecha" class="form-label">Fecha</label>
-            <input type="date" readonly class="form-control-plaintext" id="fecha" name="fecha"
-                value="{{ $inscripcion->fecha }}">
+            <label for="fecha" class="form-label">Fecha Inscripción</label>
+            <p><?php setlocale(LC_TIME, 'es_ES.UTF-8', 'spanish');?>
+            {{strftime("%d de %B de %Y", strtotime($inscripcion->fecha)) }}</p>
         </div>
-        <div class="col-md-2">
-            <label for="nro_entrada" class="form-label">Nro Entrada</label>
-            <input type="number" readonly class="form-control-plaintext" id="nro_entrada" name="nro_entrada"
-                value="{{ $inscripcion->nro_entrada }}">
-        </div>
-        <div class="col-md-3">
-            <label for="n_apellido" class="form-label">Nombre y Apellido</label>
-            <input type="text" readonly class="form-control-plaintext" id="n_apellido" name="n_apellido"
-                value="{{ $inscripcion->n_apellido }}">
+        <div class="col-md-1">
+            <label for="tipo" class="form-label">Tipo</label>
+            <p>{{ ucwords($inscripcion->tipo) }}</p>
         </div>
         <div class="col-md-2">
             <label for="celular" class="form-label">Contacto</label>
-            <input type="number" readonly class="form-control-plaintext" id="celular" name="celular"
-                value="{{ $inscripcion->celular }}">
+            <p>{{ $inscripcion->celular }}</p>
         </div>
         <div class="col-md-2">
             <label for="membresia" class="form-label">Membresía</label>
-            <input type="text" readonly class="form-control-plaintext" id="membresia" name="membresia"
-                value="{{ $inscripcion->membresia }}">
+            <p>{{ ucwords($inscripcion->membresia) }}</p>
         </div>
-        <div class="col-md-3">
-            <label for="lider" class="form-label">Lider</label>
-            <input type="text" readonly class="form-control-plaintext" id="lider" name="lider"
-                value="{{ $inscripcion->lider }}">
+        <div class="col-md-2">
+            <label for="valorTotal" class="form-label">Valor Total</label>
+            <p>{{ $inscripcion->valorTotal }}</p>
         </div>
         <div class="col-md-3 mb-3">
             <label for="inscribio" class="form-label">Incribió</label>
-            <input type="text" readonly class="form-control-plaintext" id="inscribio" name="inscribio"
-                value="{{ $inscripcion->inscribio }}">
+            <p>{{ $recepcionista->nombre }} {{ $recepcionista->apellido }}</p>
         </div>
+        <div class="col-md-3 mb-3">
+            <label for="deuda" class="form-label">Adeudado</label>
+            <p>$ {{ $inscripcion->valorTotal - $total_pagos }} </p>
+        </div>
+    </div>
+    <form class="row g-3 needs-validation" novalidate action="/pago" method="post">
+        @csrf
+        <input type="hidden" name="adeudado" value="{{($inscripcion->valorTotal-$total_pagos)}}">
 
         {{-- seccion de pago --}}
         <div class="col-12 card-group">
-            <div class="card">
+            <div class="card card-primary">
                 <div class="card-header">
                     Pago
                 </div>
@@ -76,14 +74,19 @@
                         <div class="col-2">
                             <label for="formapago" class="form-label">Forma de Pago</label>
                             <select id="formapago" name="formapago" class="form-control">
+                                 <option value="transferencia">Transferencia</option>
                                 <option value="efectivo">Efectivo</option>
-                                <option value="mp">MPago / Transf.</option>
+                                <option value="tarjeta">Tarjeta</option>
                             </select>
                         </div>
-                        <div class="col-md-3 mb-3">
+                         <div class="col-md-3 mb-3">
                             <label for="recibio" class="form-label">Recibió</label>
-                            <input type="text" class="form-control @error('recibio') is-invalid @enderror" id="recibio"
-                                name="recibio">
+                            <select id="recibio" name="recibio" class="form-control @error('recibio') is-invalid @enderror">
+                            @foreach ($recepcionistas as $la_recepcionista)
+                                <option value="{{$la_recepcionista->id}}">{{$la_recepcionista->nombre}} {{$la_recepcionista->apellido}}</option>
+                            @endforeach
+                            <option value="nn">No se sabe</option>
+                            </select>
                             @error('recibio')
                                 <span class="invalid-feedback">
                                     <strong>{{ $message }}</strong>

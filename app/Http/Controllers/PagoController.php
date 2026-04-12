@@ -45,8 +45,12 @@ class PagoController extends Controller
     {
         //retornar la vista para crear un nuevo pago (cuota)
         $inscripcion = Inscripcion::find($id);  //se puede filtrar
+        $recepcionista = Recepcionista::find($inscripcion->id_recepcionista);
+        $recepcionistas = Recepcionista::all();
+        $total_pagos = Pago::where('inscripcion_id',$id)->sum('importe');
 
-        return view('pago.create', ['inscripcion' => $inscripcion]);
+
+        return view('pago.create', ['inscripcion' => $inscripcion, 'recepcionista' => $recepcionista, 'recepcionistas' => $recepcionistas, 'total_pagos' => $total_pagos]);
     }
 
     /**
@@ -57,17 +61,26 @@ class PagoController extends Controller
      */
     public function store(Request $request)
     {
+        
         //validacion de los campos
         $request->validate([
             'fecha' => 'required | date',
             'recibio' => 'required',
-            'importe' => 'required_if:promo,cuotas | digits_between:1,2000'
+            'inscripcion_id' => 'required',
+            'importe' => ['required',
+                'digits_between:1,100000',
+                function ($attribute,$value,$fail) use($request){
+                    if($value > $request->get('adeudado')){
+                        $fail('La cuota supera la deuda.');
+                    }
+                }
+            ]
         ]);
         //guardado de los datos del formulario de nueva cuota
         $pago = new Pago();
         $pago->fecha = $request->get('fecha');
         $pago->importe = $request->get('importe');
-        $pago->recibio = ucwords(mb_strtolower($request->get('recibio')));
+        $pago->id_recepcionista = $request->get('recibio');
         $pago->modo = $request->get('formapago');
         $pago->observacion = $request->get('observacion');
         $pago->inscripcion_id = $request->get('inscripcion_id');
@@ -75,7 +88,8 @@ class PagoController extends Controller
 
         //actualizacion del estado del pago general
         $total = Pago::where('inscripcion_id',$pago->inscripcion_id)->sum('importe');
-        $inscripcion = Inscripcion::find($pago->inscripcion_id);
+        //$inscripcion = Inscripcion::find($pago->inscripcion_id);
+        $inscripcion = Inscripcion::find($request->get('inscripcion_id'));
         if(($total >= 80000 && $inscripcion->promo != "almuerzo") || ($total >= 80000 && $inscripcion->promo == "almuerzo")){
             $inscripcion->completado = 1;
         }else{
@@ -101,9 +115,8 @@ class PagoController extends Controller
                 ->get();  //se puede filtrar
         $total = Pago::where('inscripcion_id',$id)->sum('importe');
         $inscripcion = Inscripcion::find($id);  //se puede filtrar
-        $recepcionista = Recepcionista::find($inscripcion->inscribio);
 
-        return view('pago.index', ['inscripcion' => $inscripcion,'pagos' => $pagos,'total' => $total, 'recepcionista' => $recepcionista]);
+        return view('pago.index', ['inscripcion' => $inscripcion,'pagos' => $pagos,'total' => $total]);
     }
 
     /**
@@ -144,7 +157,7 @@ class PagoController extends Controller
 
         $total = Pago::where('inscripcion_id',$pago->inscripcion_id)->sum('importe');
         $inscripcion = Inscripcion::find($inscripcion_id);
-        if(($total >= 5000 && $inscripcion->promo == "sinpromo") || ($total >= 8000 && $inscripcion->promo == "almuerzo")){
+        if( $total == $inscripcion->valorTotal ){
             $inscripcion->completado = 1;
         }else{
             $inscripcion->completado = 0;

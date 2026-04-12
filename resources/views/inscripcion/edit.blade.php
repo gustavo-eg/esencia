@@ -22,14 +22,6 @@
                 </span>
             @enderror
         </div>
-        <div class="col-md-2">
-            <label for="nro_entrada" class="form-label">Nro Entrada</label>
-            <input type="number" class="form-control" id="nro_entrada" name="nro_entrada"
-                value="{{ $inscripcion->nro_entrada }}">
-            <div class="invalid-feedback">
-                Debe ingresar un número
-            </div>
-        </div>
         <div class="col-md-3">
             <label for="n_apellido" class="form-label">Nombre y Apellido</label>
             <input type="text" class="form-control" id="n_apellido" name="n_apellido"
@@ -61,16 +53,15 @@
                 </option>
             </select>
         </div>
-        <div class="col-md-3 mb-3">
+
+         <div class="col-md-3 mb-3">
             <label for="inscribio" class="form-label">Incribió</label>
-            <input type="text" class="form-control" id="inscribio" name="inscribio"
-                @if (old('inscribio') === null) value="{{ $inscripcion->inscribio }}" @else value="{{ old('inscribio') }}" @endif
-                required>
-            @error('inscribio')
-                <span class="invalid-feedback">
-                    <strong>{{ $message }}</strong>
-                </span>
-            @enderror
+            <select id="inscribio" name="inscribio" class="form-control">
+               @foreach ($recepcionistas as $recepcionista)
+                <option value="{{$recepcionista->id}}" @if ($inscripcion->id_recepcionista == $recepcionista->id) selected="selected" @endif>{{$recepcionista->nombre}} {{$recepcionista->apellido}}</option>
+               @endforeach
+            </select>
+          
         </div>
 
         <div class="col-12">

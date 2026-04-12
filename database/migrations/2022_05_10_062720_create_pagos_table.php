@@ -17,13 +17,17 @@ class CreatePagosTable extends Migration
             $table->id();
             $table->integer('importe');
             $table->string('modo');//efectivo o mercadopago
-            $table->string('recibio');
             $table->date('fecha');
             $table->string('observacion')->nullable();
             $table->foreignId('inscripcion_id')->references('id')->on('inscripcions')
                   ->constrained()
                   ->onUpdate('cascade')
                   ->onDelete('cascade');
+            $table->foreignId('id_recepcionista')
+                ->nullable()
+                ->constrained('recepcionistas','id')
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
             $table->timestamps();
         });
     }

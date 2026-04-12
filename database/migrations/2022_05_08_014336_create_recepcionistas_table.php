@@ -18,6 +18,7 @@ class CreateRecepcionistasTable extends Migration
             $table->string('nombre');
             $table->string('apellido');
             $table->timestamps();
+            $table->engine = 'InnoDB';
         });
     }
 

@@ -54,9 +54,48 @@ class InscripcionController extends Controller
             'celular' => 'nullable | numeric | gt:0',
             'fecha' => 'required | date',
             'inscribio' => 'required',
-            'financiacion' => 'required',
-            'valorTotal' => 'required | numeric | digits_between:1,6'
+            'financiacion' => [
+                'nullable',
+                function($attribute, $value, $fail) use ($request){
+                    if($value == 'cuotas'){
+                        if($request->get('valorTotal') == 0){
+                            $fail('No se permite cuotas cuando no se paga.');
+                        }
+                    }
+                }
+            ],
+            'valorTotal' => [
+                'nullable',
+                'numeric',
+                'digits_between:1,6',
+                function($attribute, $value, $fail) use ($request){
+                    if($request->get('financiacion') == 'cuotas'){
+                        if($value == $request->get('importe')){
+                            //está indicando cuota, cuando está pagando el valor total. Inconsistencia.
+                            $fail('Se trata de un pago completo.'); 
+                        }
+                    }
+                }
+                ],
+            'importe' => [
+                'numeric',
+                function ($attribute, $value, $fail) use ($request){
+                    if($request->get('financiacion') == 'completo'){
+                        if($value != $request->get('valorTotal')){
+                            $fail('El pago completo debe coincidir con el valor total.');
+                        }
+                    }
+                }
+            ]
+
         ]);
+
+        //validacion de condiciones antes de guardar
+        //1-cuando el pago es completo, el importe tiene que coincidir con el valor total
+        //2-cuando el importe coincide con el valor total, debería ser completo
+        //3-si es pastora, tiene costo cero
+        //4-si es tipo especial, puede tener cualquier valor incluso cero.
+       
         //guardado de los datos del formulario de alta
         $inscripcion = new Inscripcion();
         //$inscripcion->nro_entrada = $request->get('nro_entrada');
@@ -64,17 +103,25 @@ class InscripcionController extends Controller
         $inscripcion->n_apellido = ucwords(mb_strtolower($request->get('n_apellido')));
         $inscripcion->celular = $request->get('celular');
         $inscripcion->membresia = $request->get('membresia');
-        $inscripcion->inscribio = ucwords(mb_strtolower($request->get('inscribio')));
+        $inscripcion->id_recepcionista = $request->get('inscribio');
         $inscripcion->tipo = $request->get('tipo');
+        if($inscripcion->tipo == "pastora"){
+            $inscripcion->valorTotal = 0;
+           
+        }else{
+            $inscripcion->valorTotal = $request->get('valorTotal'); // se usa para saber el importe total que tiene que pagar
+        }
         $inscripcion->observacion = $request->get('observacion');
 
-        $inscripcion->valorTotal = $request->get('valorTotal'); // se usa para saber el importe total que tiene que pagar
+        
         if($request->get('financiacion') == "cuotas"){
             $inscripcion->financiacion = 1; //true
             $inscripcion->completado = 0; //no está completado cuando inicia con cuotas
+            $importe = $request->get('importe');
         }else{
             $inscripcion->completado = 1; //paga inicial completo
             $inscripcion->financiacion = 0; //no hay financiacion
+            $importe = $inscripcion->valorTotal;
         }
 
         $inscripcion->save();
@@ -82,18 +129,27 @@ class InscripcionController extends Controller
         //puedo obtener el id
         $nuevo_id = $inscripcion->id;
         $pago = new Pago();
-        $importe = $request->get('importe');
-       
-        $pago->importe = $importe;
-        $pago->modo = $request->get('formapago');
+       if($inscripcion->valorTotal == 0){
+            $pago->importe = 0;
+
+       }else{
+            $pago->importe = $importe;
+       }
+        //$pago->importe = $importe;
+        if($pago->importe == 0){
+            $pago->modo = "efectivo";
+        }else{
+            $pago->modo = $request->get('formapago');
+        }
         $pago->observacion = $request->get('observacion');
-        $pago->recibio = ucwords(mb_strtolower($request->get('inscribio')));
+        $pago->id_recepcionista = $request->get('inscribio');
         $pago->fecha = $request->get('fecha');
         $pago->inscripcion_id = $nuevo_id;
         $pago->save();
         
         //una vez guardado, se manda a la pagina del listado
         return redirect('/inscripcion');
+  
     }
 
     /**
@@ -117,7 +173,8 @@ class InscripcionController extends Controller
     {
         //
         $inscripcion = Inscripcion::find($id);  //se puede filtrar
-        return view('inscripcion.edit')->with('inscripcion',$inscripcion);
+        $recepcionistas = Recepcionista::all();
+        return view('inscripcion.edit')->with(['inscripcion' => $inscripcion, 'recepcionistas' => $recepcionistas]);
     }
 
     /**
@@ -133,19 +190,16 @@ class InscripcionController extends Controller
           //validacion de los campos
         $request->validate([
             'n_apellido' => 'required',
-            'nro_entrada' => 'nullable | numeric | digits_between:0,500',
             'celular' => 'nullable | numeric | gt:0',
             'fecha' => 'required | date',
             'inscribio' => 'required'
         ]);
           $inscripcion = Inscripcion::find($id);
-          $inscripcion->nro_entrada = $request->get('nro_entrada');
           $inscripcion->fecha = $request->get('fecha');
           $inscripcion->n_apellido = ucwords(mb_strtolower($request->get('n_apellido')));
           $inscripcion->celular = $request->get('celular');
           $inscripcion->membresia = $request->get('membresia');
-          $inscripcion->lider = ucwords(mb_strtolower($request->get('lider')));
-          $inscripcion->inscribio = ucwords(mb_strtolower($request->get('inscribio')));
+          $inscripcion->id_recepcionista = $request->get('inscribio');
   
           $inscripcion->save();
           
